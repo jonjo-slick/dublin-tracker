@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dublin 2027 | Prospect Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f2ed;
+  --surface: #ffffff;
+  --surface2: #eeeae2;
+  --border: rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.18);
+  --text: #18160f;
+  --text2: #65625a;
+  --text3: #9c9890;
+  --accent: #1b4332;
+  --accent2: #2d6a4f;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --header-h: 56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;}
+
+/* ── HEADER ── */
+header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  height:var(--header-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.25rem;
+  position:sticky;top:0;z-index:60;
+  gap:12px;
+}
+.header-logos{display:flex;align-items:center;gap:14px;}
+.header-logos img{height:26px;object-fit:contain;}
+.header-divider{width:1px;height:20px;background:var(--border2);flex-shrink:0;}
+.header-title{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.btn-primary{background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-secondary{background:transparent;color:var(--text2);border:1px solid var(--border2);padding:6px 14px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;}
+.btn-secondary:hover{background:var(--surface2);}
+
+/* ── MAIN ── */
+.main{max-width:1100px;margin:0 auto;padding:1.25rem 1.25rem;}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.25rem;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+.stat-num{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:160px;max-width:240px;}
+.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px 6px 28px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);outline:none;}
+.search-wrap input:focus{border-color:var(--border2);}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none;}
+.filters{display:flex;gap:5px;flex-wrap:wrap;}
+.pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--text2);white-space:nowrap;}
+.pill:hover{border-color:var(--border2);color:var(--text);}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text);}
+.owner-filter{display:flex;gap:5px;}
+.owner-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--text2);white-space:nowrap;}
+.owner-pill:hover{border-color:var(--border2);}
+.owner-pill.active-jonjo{background:#1b4332;color:#fff;border-color:#1b4332;}
+.owner-pill.active-tom{background:#1a3c6e;color:#fff;border-color:#1a3c6e;}
+.owner-pill.active-all{background:var(--text);color:#fff;border-color:var(--text);}
+.owner-pill.active-george{background:#7a3b1e;color:#fff;border-color:#7a3b1e;}
+.dot-george{background:#7a3b1e;}
+
+/* ── ACCORDION ── */
+.accordion{display:flex;flex-direction:column;gap:8px;}
+.acc-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.acc-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;cursor:pointer;user-select:none;
+  transition:background 0.12s;
+}
+.acc-header:hover{background:#faf8f4;}
+.acc-header-left{display:flex;align-items:center;gap:10px;}
+.acc-stage-label{font-size:13px;font-weight:500;color:var(--text);}
+.acc-count{font-size:11px;color:var(--text3);background:var(--bg);border-radius:20px;padding:2px 8px;}
+.acc-spots{font-size:11px;color:var(--text2);}
+.acc-chevron{font-size:12px;color:var(--text3);transition:transform 0.2s;}
+.acc-chevron.open{transform:rotate(180deg);}
+.acc-body{display:none;}
+.acc-body.open{display:block;}
+.acc-body table{width:100%;border-collapse:collapse;}
+.acc-body thead tr{background:var(--bg);border-bottom:1px solid var(--border);}
+.acc-body th{padding:7px 12px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);font-weight:500;text-align:left;white-space:nowrap;}
+.acc-body tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;}
+.acc-body tbody tr:last-child{border-bottom:none;}
+.acc-body tbody tr:hover{background:#faf8f4;}
+.acc-body td{padding:9px 12px;vertical-align:middle;}
+.show-all-btn{font-size:11px;color:var(--accent2);background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;}
+.show-all-btn:hover{text-decoration:underline;}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--bg);border-bottom:1px solid var(--border);}
+th{padding:8px 12px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);font-weight:500;text-align:left;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#faf8f4;}
+td{padding:9px 12px;vertical-align:middle;}
+.td-name{font-weight:500;font-size:13px;color:var(--text);}
+.td-org{font-size:12px;color:var(--text2);}
+.td-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.td-notes{font-size:11.5px;color:var(--text2);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.td-action{font-size:11px;color:var(--accent2);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;}
+.owner-dot{display:inline-flex;align-items:center;gap:5px;font-size:11px;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot-jonjo{background:#1b4332;}
+.dot-tom{background:#1a3c6e;}
+.brand-row{background:#fffbf4;}
+.brand-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#7a5a10;background:#fdf0dc;border-radius:20px;padding:2px 8px;font-weight:500;}
+
+/* Stage colours */
+.s-target      {background:#ebebeb;color:#444;}
+.s-contacted   {background:#e8effa;color:#1a3c6e;}
+.s-responded   {background:#fdf0dc;color:#6b3d0a;}
+.s-interested  {background:#e8f5ee;color:#1a5c3a;}
+.s-meeting     {background:#eeebfa;color:#3c2a6e;}
+.s-negotiating {background:#faede8;color:#7a2810;}
+.s-verbal      {background:#fff3cd;color:#856404;}
+.s-paid        {background:#d4edda;color:#155724;}
+.s-dead        {background:#fae8e8;color:#7a1a1a;}
+
+/* ── EMPTY ── */
+.empty{padding:3rem;text-align:center;color:var(--text3);}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:flex-start;justify-content:center;padding:50px 1rem 2rem;overflow-y:auto;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border-radius:14px;border:1px solid var(--border);width:100%;max-width:520px;padding:1.5rem;box-shadow:0 8px 40px rgba(0,0,0,0.14);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.modal-header h3{font-size:15px;font-weight:500;}
+.close-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1;padding:0;}
+.close-btn:hover{color:var(--text);}
+.form-section{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-row{margin-bottom:10px;}
+.form-row label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:4px;}
+.form-row input,.form-row select,.form-row textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);outline:none;}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:var(--border2);background:var(--surface);}
+.form-row textarea{height:72px;resize:vertical;line-height:1.5;}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.toggle-label{font-size:12px;color:var(--text2);}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:20px;cursor:pointer;transition:background 0.2s;}
+.toggle-slider:before{content:'';position:absolute;width:14px;height:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform 0.2s;}
+.toggle input:checked+.toggle-slider{background:var(--accent);}
+.toggle input:checked+.toggle-slider:before{transform:translateX(16px);}
+.contact-section{display:none;}
+.contact-section.visible{display:block;}
+.modal-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);}
+.btn-del{background:none;border:1px solid #e0b0b0;border-radius:var(--radius-sm);padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;color:#7a1a1a;cursor:pointer;}
+.btn-del:hover{background:#fae8e8;}
+.btn-group{display:flex;gap:8px;}
+.btn-cancel{background:none;border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;}
+.btn-cancel:hover{background:var(--surface2);}
+.btn-save{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:6px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;}
+.btn-save:hover{background:var(--accent2);}
+
+/* ── SUPABASE CONFIG ── */
+.config-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:300;align-items:center;justify-content:center;padding:1.5rem;}
+.config-screen.open{display:flex;}
+.config-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:2rem;max-width:460px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,0.1);}
+.config-logos{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
+.config-logos img{height:28px;object-fit:contain;}
+.config-box h2{font-size:16px;font-weight:500;margin-bottom:6px;}
+.config-box p{font-size:12px;color:var(--text2);margin-bottom:1.25rem;line-height:1.6;}
+.config-box .form-row{margin-bottom:12px;}
+.config-note{font-size:11px;color:var(--text3);margin-top:1rem;line-height:1.6;}
+.config-note a{color:var(--accent2);}
+.btn-connect{width:100%;background:var(--accent);color:#fff;border:none;padding:9px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;margin-top:12px;}
+.btn-connect:hover{background:var(--accent2);}
+.btn-local{width:100%;background:transparent;color:var(--text2);border:1px solid var(--border2);padding:8px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;margin-top:8px;}
+.btn-local:hover{background:var(--surface2);}
+
+/* ── MOBILE CARD LIST (replaces table on small screens) ── */
+.card-list{display:none;flex-direction:column;gap:0;}
+.prospect-card{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;cursor:pointer;active-bg:#f5f3ee;}
+.prospect-card:active{background:#f5f3ee;}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
+.pc-name{font-size:14px;font-weight:500;color:var(--text);}
+.pc-org{font-size:12px;color:var(--text2);margin-top:1px;}
+.pc-industry{font-size:11px;color:var(--text3);margin-top:1px;}
+.pc-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.pc-action{font-size:12px;color:var(--accent2);margin-top:6px;}
+.pc-owner{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);}
+
+@media(max-width:700px){
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .stat{padding:10px 12px;}
+  .stat-num{font-size:20px;}
+  .form-grid{grid-template-columns:1fr;}
+  .main{padding:0.75rem 0;}
+  .toolbar{padding:0 0.75rem;}
+  header{padding:0 0.75rem;height:52px;}
+  .header-title{display:none;}
+  .header-divider{display:none;}
+  .header-logos img{height:22px;}
+  .btn-secondary{display:none;}
+  .btn-primary{font-size:12px;padding:6px 12px;}
+  /* hide table, show cards */
+  .table-wrap{display:none;}
+  .card-list{display:flex;}
+  .stats{margin:0.75rem 0.75rem 0.75rem;}
+  .toolbar{margin-bottom:0.75rem;}
+  .table-wrap{border-radius:0;border-left:none;border-right:none;}
+  .card-list-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+}
+@media(max-width:380px){
+  .stats{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- CONFIG SCREEN -->
+<div class="config-screen" id="config-screen">
+  <div class="config-box">
+    <div class="config-logos">
+      <img src="https://i.postimg.cc/Njd5D9vR/Slick-Logo.png" alt="Slick Travel">
+      <div style="width:1px;height:22px;background:var(--border2);"></div>
+      <img src="https://i.postimg.cc/C1dvbfHS/Thrive-primary.png" alt="Thrive">
+    </div>
+    <h2>Connect to Supabase</h2>
+    <p>To sync live between Jonjo and Tom, enter your Supabase project credentials below. Find these in your Supabase dashboard under Settings &gt; API.</p>
+    <div class="form-row"><label>Project URL</label><input id="cfg-url" placeholder="https://xxxx.supabase.co"></div>
+    <div class="form-row"><label>Anon Public Key</label><input id="cfg-key" placeholder="eyJ..."></div>
+    <button class="btn-connect" onclick="connectSupabase()">Connect and sync</button>
+    <button class="btn-local" onclick="useLocal()">Use locally (no sync)</button>
+    <div class="config-note">Don't have a Supabase project yet? Create one free at <a href="https://supabase.com" target="_blank">supabase.com</a>, then go to Settings &gt; API for your URL and key.</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-logos">
+    <img src="https://i.postimg.cc/Njd5D9vR/Slick-Logo.png" alt="Slick Travel" onerror="this.style.display='none'">
+    <div class="header-divider"></div>
+    <img src="https://i.postimg.cc/C1dvbfHS/Thrive-primary.png" alt="Thrive" onerror="this.style.display='none'">
+    <div class="header-divider"></div>
+    <span class="header-title">Dublin 2027</span>
+  </div>
+  <div class="header-right">
+    <button class="btn-secondary" onclick="exportCSV()">↓ Export</button>
+    <button class="btn-secondary" onclick="openConfig()">⚙ Settings</button>
+    <button class="btn-primary" onclick="openAdd(false)">+ Add lead</button>
+    <button class="btn-secondary hide-on-mobile" onclick="openAdd(true)">+ Brand</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="Search name, org..." oninput="render()">
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="owner-filter" id="owner-filters"></div>
+    <select id="sort-select" onchange="setSort(this.value)" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--text2);cursor:pointer;outline:none;">
+      <option value="date-desc">Latest first</option>
+      <option value="date-asc">Oldest first</option>
+      <option value="name-asc">A to Z</option>
+      <option value="name-desc">Z to A</option>
+      <option value="spots-desc">Most spots</option>
+    </select>
+    <button class="show-all-btn" onclick="toggleAllSections()" id="toggle-all-btn">Collapse all</button>
+  </div>
+
+  <div class="accordion" id="accordion"></div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Add lead</h3>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="toggle-row" id="brand-toggle-row">
+      <label class="toggle"><input type="checkbox" id="f-is-brand" onchange="toggleBrandMode()"><span class="toggle-slider"></span></label>
+      <span class="toggle-label">Brand target (contact not identified yet)</span>
+    </div>
+
+    <div class="form-section">Organisation</div>
+    <div class="form-grid">
+      <div class="form-row"><label>Organisation (optional)</label><input id="f-org" placeholder="Company / club"></div>
+      <div class="form-row"><label>Industry / type</label><input id="f-industry" placeholder="e.g. Hospitality, Finance"></div>
+    </div>
+
+    <div class="contact-section" id="contact-section">
+      <div class="form-section">Contact</div>
+      <div class="form-grid">
+        <div class="form-row"><label>Name</label><input id="f-name" placeholder="Full name"></div>
+        <div class="form-row"><label>Role</label><input id="f-role" placeholder="Job title"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label>Email</label><input id="f-email" type="email" placeholder="email@company.com"></div>
+        <div class="form-row"><label>Phone</label><input id="f-phone" type="tel" placeholder="+44 7700 000000"></div>
+      </div>
+    </div>
+
+    <div class="form-section">Deal</div>
+    <div class="form-grid">
+      <div class="form-row"><label>Stage</label><select id="f-stage"></select></div>
+      <div class="form-row"><label>Owner</label><select id="f-owner"><option value="Jonjo">Jonjo</option><option value="Tom">Tom</option><option value="George">George</option></select></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>Spots (optional)</label><input id="f-spots" type="number" min="1" max="20" placeholder="e.g. 2"></div>
+      <div class="form-row"></div>
+    </div>
+    <div class="form-row"><label>Notes</label><textarea id="f-notes" placeholder="Key context, blockers, latest conversation..."></textarea></div>
+    <div class="form-row"><label>Next action</label><input id="f-action" placeholder="e.g. Call Thursday, Send proposal"></div>
+
+    <div class="modal-footer">
+      <button class="btn-del" id="del-btn" onclick="deleteCurrent()" style="display:none">Delete</button>
+      <div class="btn-group">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" onclick="saveProspect()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STAGES ──────────────────────────────────────────────────
+const STAGES = [
+  {id:'paid',        label:'Paid / confirmed',  cls:'s-paid'},
+  {id:'verbal',      label:'Verbal confirm',    cls:'s-verbal'},
+  {id:'negotiating', label:'Negotiating',       cls:'s-negotiating'},
+  {id:'meeting',     label:'Meeting / call',    cls:'s-meeting'},
+  {id:'interested',  label:'Interested',        cls:'s-interested'},
+  {id:'responded',   label:'Responded',         cls:'s-responded'},
+  {id:'contacted',   label:'Contacted',         cls:'s-contacted'},
+  {id:'identified',  label:'Identified',        cls:'s-target'},
+  {id:'target',      label:'Brand target',      cls:'s-target'},
+  {id:'dead',        label:'Not progressing',   cls:'s-dead'},
+];
+
+const LEAD_STAGES = STAGES.filter(s => s.id !== 'target');
+const BRAND_STAGES = STAGES.filter(s => ['target','identified','dead'].includes(s.id));
+
+const OWNERS = ['All','Jonjo','Tom','George'];
+const OWNER_ACTIVE_CLS = {All:'active-all', Jonjo:'active-jonjo', Tom:'active-tom', George:'active-george'};
+
+const DEFAULTS = [
+  {id:'p1',isBrand:false,name:'Mark Foster',org:'Leicester Tigers',role:'CCO',email:'',phone:'07786028590',industry:'Rugby',stage:'interested',owner:'Jonjo',notes:'Introduced via Leon at Pracademia. Interested, needs to speak to Matt Poole at Tigers events.',action:'Call Thu/Fri this week',date:'2026-05-01'},
+  {id:'p2',isBrand:false,name:'Richard Owens',org:'London Irish Business Society',role:'',email:'',phone:'',industry:'Business society',stage:'responded',owner:'Jonjo',notes:'Well connected. Discussing internally.',action:'Follow up on internal discussion',date:'2026-04-27'},
+  {id:'p3',isBrand:false,name:'Lucas Jones',org:'Lowicks',role:'',email:'',phone:'',industry:'',stage:'contacted',owner:'Jonjo',notes:'Short chat on LinkedIn.',action:'Progress the conversation',date:'2026-04-27'},
+  {id:'p4',isBrand:false,name:'AK',org:'Oundle Rugby',role:'',email:'',phone:'',industry:'Rugby',stage:'identified',owner:'Jonjo',notes:'Need to get in touch via Harry Offer.',action:'Contact via Harry Offer',date:'2026-04-27'},
+  {id:'p5',isBrand:false,name:'Josh Bentley',org:'Sport Industry Group',role:'Marketing Manager',email:'',phone:'',industry:'Sports marketing',stage:'meeting',owner:'Jonjo',notes:'Introduced by George Offer at 2excel. Replied positively. Calendar invite accepted. MD conversation pending.',action:'Call Friday, confirm MD outcome',date:'2026-05-05'},
+  {id:'p6',isBrand:false,name:"Alex O'Neill",org:'Fairway Healthcare',role:'',email:'',phone:'',industry:'Healthcare',stage:'interested',owner:'Jonjo',notes:"Said rejoining would be 'amazing'. Questions re flights (Shannon) and hotel standard.",action:'Confirm flight/hotel details',date:'2026-04-27'},
+  {id:'p7',isBrand:false,name:'Guy Hogg',org:'Performance Flooring',role:'MD',email:'',phone:'',industry:'',stage:'responded',owner:'Jonjo',notes:'Awaiting Rob at Ignite getting in touch.',action:'Ensure Rob at Ignite follows up',date:'2026-04-27'},
+  {id:'p8',isBrand:false,name:'Mark Wright',org:'Echelon Group',role:'',email:'mwright@echelongroupint.com',phone:'+44 7447 804630',industry:'Fundraising',stage:'responded',owner:'Jonjo',notes:"Responded positively, congratulated on Rome. Will have conversations and report back.",action:'Follow up on internal conversations',date:'2026-04-23'},
+  {id:'p9',isBrand:false,name:'Tony Haddad',org:'CBRE',role:'',email:'',phone:'',industry:'Real estate',stage:'contacted',owner:'Jonjo',notes:'Reached out 7 May with Rome highlights.',action:'Chase for response',date:'2026-05-07'},
+  {id:'p10',isBrand:false,name:'Carolyn Rich',org:'Allianz',role:'',email:'',phone:'',industry:'Insurance',stage:'contacted',owner:'Jonjo',notes:'Reached out 23 Apr, followed up 7 May. No response.',action:'Chase again if no reply by end of week',date:'2026-05-07'},
+  {id:'p11',isBrand:false,name:'Tom Green',org:'Inflexion',role:'',email:'',phone:'',industry:'Private equity',stage:'contacted',owner:'Jonjo',notes:'Reached out 23 Apr. No response.',action:'Follow up',date:'2026-04-23'},
+  {id:'p12',isBrand:false,name:'Matthew Upton',org:'Omoda Auto',role:'',email:'',phone:'',industry:'Automotive',stage:'contacted',owner:'Jonjo',notes:'Reached out 23 Apr. No response.',action:'Follow up',date:'2026-04-23'},
+  {id:'p13',isBrand:false,name:'Joanna Osborne',org:'Investec',role:'',email:'',phone:'',industry:'Finance',stage:'responded',owner:'Jonjo',notes:'Replied warmly. Would love Investec involved. Sent Rome reel.',action:'Follow up to progress Investec involvement',date:'2026-04-24'},
+  {id:'p14',isBrand:false,name:'Darren Ellis',org:'Quintessentially',role:'',email:'',phone:'',industry:'Luxury lifestyle',stage:'responded',owner:'Jonjo',notes:'Looped in with Charlotte Thornycroft. Darren appears keen.',action:'Chase Darren and Charlotte',date:'2026-04-30'},
+  {id:'p15',isBrand:false,name:'Iain Balshaw',org:'Alpha Group',role:'',email:'',phone:'',industry:'',stage:'contacted',owner:'Jonjo',notes:'Missed Rome. Reached out 20 Apr.',action:'Follow up',date:'2026-04-20'},
+  {id:'p16',isBrand:false,name:'Marie Houlgate',org:'Virgin Media O2',role:'',email:'',phone:'',industry:'Telecoms',stage:'responded',owner:'Jonjo',notes:'Declined Rome due to commitments but asked to be kept in mind. Re-engaged for Dublin.',action:'Follow up on Dublin interest',date:'2026-04-20'},
+  {id:'p17',isBrand:false,name:'Emily Charlesworth',org:'Nyetimber',role:'',email:'',phone:'',industry:'Wine',stage:'contacted',owner:'Jonjo',notes:'Reached out 20 Apr re 6N brand campaign angle.',action:'Follow up',date:'2026-04-20'},
+  {id:'p18',isBrand:false,name:'Amy Gibson',org:'Jaguar Land Rover',role:'',email:'',phone:'',industry:'Automotive',stage:'contacted',owner:'Jonjo',notes:'Reached out 20-21 Apr (two addresses tried).',action:'Follow up',date:'2026-04-21'},
+  {id:'p19',isBrand:false,name:'Matt Blakeman',org:'Morgan Lovell',role:'',email:'',phone:'',industry:'',stage:'contacted',owner:'Jonjo',notes:'Reached out 27 Apr.',action:'Follow up',date:'2026-04-27'},
+  {id:'p20',isBrand:false,name:'Alan',org:'Gala Hospitality',role:'',email:'',phone:'',industry:'Hospitality',stage:'contacted',owner:'Jonjo',notes:'Tony Baxter connection. Reached out 7 May.',action:'Follow up',date:'2026-05-07'},
+];
+
+// ── STATE ────────────────────────────────────────────────────
+let prospects = [];
+let activeFilter = 'all';
+let activeOwner = 'All';
+let activeSort = 'date-desc';
+let editingId = null;
+let collapsedSections = {}; // stage id -> true means collapsed
+
+function toggleSection(stageId) {
+  collapsedSections[stageId] = !collapsedSections[stageId];
+  render();
+}
+
+function toggleAllSections() {
+  const anyCollapsed = STAGES.some(s => collapsedSections[s.id] === true);
+  if (anyCollapsed) {
+    // expand all
+    collapsedSections = {};
+  } else {
+    // collapse all
+    STAGES.forEach(s => collapsedSections[s.id] = true);
+  }
+  render();
+}
+let supabaseUrl = '';
+let supabaseKey = '';
+let useSupabase = false;
+const LS_KEY = 'dublin2027_v2';
+const CFG_KEY = 'dublin2027_cfg';
+
+// ── INIT ─────────────────────────────────────────────────────
+async function init() {
+  const cfg = JSON.parse(localStorage.getItem(CFG_KEY) || 'null');
+  if (cfg && cfg.url && cfg.key) {
+    supabaseUrl = cfg.url;
+    supabaseKey = cfg.key;
+    useSupabase = true;
+    await loadFromSupabase();
+  } else if (cfg && cfg.local) {
+    loadLocal();
+  } else {
+    document.getElementById('config-screen').classList.add('open');
+  }
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    prospects = raw ? JSON.parse(raw) : DEFAULTS;
+  } catch { prospects = DEFAULTS; }
+  render();
+}
+
+function saveLocal() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(prospects)); } catch {}
+}
+
+// ── SUPABASE ─────────────────────────────────────────────────
+async function sbFetch(path, opts={}) {
+  const res = await fetch(supabaseUrl + '/rest/v1/' + path, {
+    ...opts,
+    headers: {
+      'apikey': supabaseKey,
+      'Authorization': 'Bearer ' + supabaseKey,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...(opts.headers||{})
+    }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function ensureTable() {
+  // Check if table exists by attempting a select
+  try {
+    await sbFetch('dublin2027_prospects?limit=1');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function loadFromSupabase() {
+  try {
+    const data = await sbFetch('dublin2027_prospects?order=date.desc');
+    if (data && data.length > 0) {
+      // normalise isBrand field regardless of column casing
+      prospects = data.map(p => ({
+        ...p,
+        isBrand: p.isbrand || p.isBrand || false,
+        spots: p.spots || null,
+      }));
+    } else {
+      // table is empty, seed with defaults
+      prospects = DEFAULTS;
+      for (const p of prospects) {
+        try {
+          const payload = { ...p, isbrand: p.isBrand || false };
+          delete payload.isBrand;
+          await sbFetch('dublin2027_prospects', {
+            method:'POST',
+            prefer:'return=minimal',
+            body: JSON.stringify(payload)
+          });
+        } catch(e) { console.error('Seed failed for', p.id, e); }
+      }
+    }
+  } catch(e) {
+    console.error('Load from Supabase failed:', e);
+    showSupabaseSetup();
+    return;
+  }
+  render();
+}
+
+function showSupabaseSetup() {
+  alert('Supabase connected but the table does not exist yet.\n\nRun this SQL in your Supabase SQL editor:\n\nCREATE TABLE dublin2027_prospects (\n  id text primary key,\n  "isBrand" boolean,\n  name text,\n  org text,\n  role text,\n  email text,\n  phone text,\n  industry text,\n  stage text,\n  owner text,\n  notes text,\n  action text,\n  date text\n);\n\nALTER TABLE dublin2027_prospects ENABLE ROW LEVEL SECURITY;\nCREATE POLICY "public" ON dublin2027_prospects FOR ALL USING (true) WITH CHECK (true);\n\nThen refresh this page.');
+}
+
+async function upsertSupabase(p) {
+  if (!useSupabase) return;
+  // Build a clean payload with only columns that exist in the table
+  const payload = {
+    id: p.id,
+    isbrand: p.isBrand || false,
+    name: p.name || '',
+    org: p.org || '',
+    role: p.role || '',
+    email: p.email || '',
+    phone: p.phone || '',
+    industry: p.industry || '',
+    stage: p.stage || '',
+    owner: p.owner || '',
+    spots: p.spots || null,
+    notes: p.notes || '',
+    action: p.action || '',
+    date: p.date || '',
+  };
+  try {
+    const res = await fetch(supabaseUrl + '/rest/v1/dublin2027_prospects', {
+      method: 'POST',
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': 'Bearer ' + supabaseKey,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Supabase save error:', err);
+      alert('Save failed: ' + err);
+    }
+  } catch(e) {
+    console.error('Supabase upsert failed:', e);
+    alert('Save failed: ' + e.message);
+  }
+}
+
+async function deleteSupabase(id) {
+  if (!useSupabase) return;
+  try {
+    await sbFetch('dublin2027_prospects?id=eq.' + encodeURIComponent(id), {
+      method:'DELETE', prefer:'return=minimal'
+    });
+  } catch(e) { console.error('Supabase delete failed:', e); }
+}
+
+// ── CONFIG ───────────────────────────────────────────────────
+function openConfig() { document.getElementById('config-screen').classList.add('open'); }
+
+async function connectSupabase() {
+  const url = document.getElementById('cfg-url').value.trim().replace(/\/$/,'');
+  const key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { alert('Please enter both the URL and key.'); return; }
+  supabaseUrl = url;
+  supabaseKey = key;
+  useSupabase = true;
+  localStorage.setItem(CFG_KEY, JSON.stringify({url, key}));
+  document.getElementById('config-screen').classList.remove('open');
+  await loadFromSupabase();
+}
+
+function useLocal() {
+  localStorage.setItem(CFG_KEY, JSON.stringify({local:true}));
+  document.getElementById('config-screen').classList.remove('open');
+  loadLocal();
+}
+
+// ── RENDER ───────────────────────────────────────────────────
+function stageFor(id) { return STAGES.find(s=>s.id===id) || STAGES[0]; }
+
+function formatDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+
+function render() {
+  const q = (document.getElementById('search').value||'').toLowerCase();
+  const counts = {all: prospects.length};
+  STAGES.forEach(s => counts[s.id] = 0);
+  prospects.forEach(p => { if (counts[p.stage] !== undefined) counts[p.stage]++; });
+
+  const paid = counts.paid || 0;
+  const verbal = counts.verbal || 0;
+  const warm = (counts.interested||0) + (counts.meeting||0) + (counts.negotiating||0);
+  const waiting = counts.contacted || 0;
+  const spotsPaid = prospects
+    .filter(p => p.stage === 'paid' && p.spots)
+    .reduce((sum, p) => sum + (parseInt(p.spots)||0), 0);
+  const spotsVerbal = prospects
+    .filter(p => ['verbal','paid'].includes(p.stage) && p.spots)
+    .reduce((sum, p) => sum + (parseInt(p.spots)||0), 0);
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Total prospects</div><div class="stat-num">${prospects.length}</div></div>
+    <div class="stat"><div class="stat-label">Warm / active</div><div class="stat-num" style="color:#1a3c6e">${warm}</div></div>
+    <div class="stat" style="border-color:#c3e6cb"><div class="stat-label" style="color:#155724">Spots sold (paid)</div><div class="stat-num" style="color:#155724">${spotsPaid}</div></div>
+    <div class="stat" style="border-color:#ffeeba"><div class="stat-label" style="color:#856404">Spots inc. verbal</div><div class="stat-num" style="color:#856404">${spotsVerbal}</div></div>
+    <div class="stat"><div class="stat-label">Awaiting reply</div><div class="stat-num" style="color:#6b3d0a">${waiting}</div></div>
+  `;
+
+  document.getElementById('owner-filters').innerHTML =
+    OWNERS.map(o => {
+      const cls = activeOwner===o ? 'owner-pill ' + OWNER_ACTIVE_CLS[o] : 'owner-pill';
+      return `<button class="${cls}" onclick="setOwner('${o}')">${o}</button>`;
+    }).join('');
+
+  let filtered = prospects;
+  if (activeFilter !== 'all') filtered = filtered.filter(p => p.stage === activeFilter);
+  if (activeOwner !== 'All') filtered = filtered.filter(p => p.owner === activeOwner);
+  if (q) filtered = filtered.filter(p =>
+    (p.name||'').toLowerCase().includes(q) ||
+    (p.org||'').toLowerCase().includes(q) ||
+    (p.industry||'').toLowerCase().includes(q)
+  );
+
+  // Sort
+  const STAGE_ORDER = STAGES.map(s => s.id);
+  filtered = [...filtered].sort((a, b) => {
+    switch(activeSort) {
+      case 'name-asc':  return (a.name||a.org||'').localeCompare(b.name||b.org||'');
+      case 'name-desc': return (b.name||b.org||'').localeCompare(a.name||a.org||'');
+      case 'stage':     return STAGE_ORDER.indexOf(a.stage) - STAGE_ORDER.indexOf(b.stage);
+      case 'spots-desc':return (parseInt(b.spots)||0) - (parseInt(a.spots)||0);
+      case 'date-asc':  return (a.date||'').localeCompare(b.date||'');
+      case 'date-desc':
+      default:          return (b.date||'').localeCompare(a.date||'');
+    }
+  });
+
+  // Update sort indicators
+  ['name','stage','spots','date'].forEach(k => {
+    const el = document.getElementById('sort-'+k);
+    if (el) el.textContent = '';
+  });
+  if (activeSort === 'name-asc') document.getElementById('sort-name').textContent = ' ↑';
+  if (activeSort === 'name-desc') document.getElementById('sort-name').textContent = ' ↓';
+  if (activeSort === 'stage') document.getElementById('sort-stage').textContent = ' ↑';
+  if (activeSort === 'spots-desc') document.getElementById('sort-spots').textContent = ' ↓';
+  if (activeSort === 'date-asc') document.getElementById('sort-date').textContent = ' ↑';
+  if (activeSort === 'date-desc') document.getElementById('sort-date').textContent = ' ↓';
+
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('empty');
+
+  // Build accordion
+  const accordion = document.getElementById('accordion');
+  if (!filtered.length) {
+    accordion.innerHTML = '<div class="empty" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:3rem;text-align:center;color:var(--text3);">No prospects match.</div>';
+    return;
+  }
+
+  // Group by stage in defined order
+  const grouped = {};
+  STAGES.forEach(s => grouped[s.id] = []);
+  filtered.forEach(p => {
+    if (grouped[p.stage]) grouped[p.stage].push(p);
+    else grouped['contacted'] = grouped['contacted'] || [];
+  });
+
+  accordion.innerHTML = STAGES.map(st => {
+    const rows = grouped[st.id] || [];
+    if (!rows.length) return '';
+    const isOpen = collapsedSections[st.id] !== true;
+    const spotsTotal = rows.reduce((s, p) => s + (parseInt(p.spots)||0), 0);
+    const spotsLabel = spotsTotal > 0 ? `<span class="acc-spots">${spotsTotal} spot${spotsTotal>1?'s':''}</span>` : '';
+
+    const rowsHtml = rows.map(p => {
+      const ownerColor = p.owner==='Jonjo' ? 'dot-jonjo' : p.owner==='Tom' ? 'dot-tom' : 'dot-george';
+      const nameLine = p.isBrand
+        ? `<span class="brand-badge">◆ Brand target</span>`
+        : `<span class="td-name">${p.name||''}</span>`;
+      return `<tr onclick="openEdit('${p.id}')">
+        <td>
+          <div>${nameLine}</div>
+          <div class="td-org">${p.org||''}${p.role?' · '+p.role:''}</div>
+          ${p.industry?`<div class="td-sub">${p.industry}</div>`:''}
+        </td>
+        <td class="hide-mobile"><span class="owner-dot"><span class="dot ${ownerColor}"></span>${p.owner||''}</span></td>
+        <td class="td-notes hide-mobile">${p.notes||''}</td>
+        <td class="td-action">${p.action?'→ '+p.action:''}</td>
+        <td class="hide-mobile" style="font-size:11px;color:var(--text3);white-space:nowrap;">${p.spots?`<span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--text);">${p.spots}</span> <span style="color:var(--text3);font-size:10px;">spot${p.spots>1?'s':''}</span>`:''}</td>
+        <td class="hide-mobile" style="font-size:11px;color:var(--text3);white-space:nowrap;">${formatDate(p.date)}</td>
+      </tr>`;
+    }).join('');
+
+    return `<div class="acc-section">
+      <div class="acc-header" onclick="toggleSection('${st.id}')">
+        <div class="acc-header-left">
+          <span class="badge ${st.cls}">${st.label}</span>
+          <span class="acc-count">${rows.length}</span>
+          ${spotsLabel}
+        </div>
+        <span class="acc-chevron ${isOpen?'open':''}">▼</span>
+      </div>
+      <div class="acc-body ${isOpen?'open':''}">
+        <table>
+          <thead><tr>
+            <th onclick="toggleSort('name')" style="cursor:pointer;">Name / Org</th>
+            <th class="hide-mobile">Owner</th>
+            <th class="hide-mobile">Notes</th>
+            <th>Next action</th>
+            <th class="hide-mobile">Spots</th>
+            <th class="hide-mobile" onclick="toggleSort('date')" style="cursor:pointer;">Updated</th>
+          </tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update collapse all button label
+  const anyCollapsed = STAGES.some(s => collapsedSections[s.id] === true);
+  const btn = document.getElementById('toggle-all-btn');
+  if (btn) btn.textContent = anyCollapsed ? 'Expand all' : 'Collapse all';
+}
+
+function setFilter(f) { activeFilter=f; render(); }
+function setOwner(o) { activeOwner=o; render(); }
+function setSort(s) { activeSort=s; render(); }
+function toggleSort(col) {
+  const map = {
+    name: activeSort==='name-asc' ? 'name-desc' : 'name-asc',
+    stage: 'stage',
+    spots: 'spots-desc',
+    date: activeSort==='date-desc' ? 'date-asc' : 'date-desc',
+  };
+  activeSort = map[col] || 'date-desc';
+  document.getElementById('sort-select').value = activeSort;
+  render();
+}
+
+// ── MODAL ────────────────────────────────────────────────────
+function toggleBrandMode() {
+  const isBrand = document.getElementById('f-is-brand').checked;
+  document.getElementById('contact-section').classList.toggle('visible', !isBrand);
+  populateStages(null, isBrand);
+}
+
+function populateStages(selected, isBrand) {
+  const list = isBrand ? BRAND_STAGES : LEAD_STAGES;
+  const sel = document.getElementById('f-stage');
+  sel.innerHTML = list.map(s => `<option value="${s.id}"${s.id===selected?' selected':''}>${s.label}</option>`).join('');
+}
+
+function openAdd(isBrand) {
+  editingId = null;
+  document.getElementById('modal-title').textContent = isBrand ? 'Add brand target' : 'Add lead';
+  document.getElementById('del-btn').style.display = 'none';
+  document.getElementById('f-is-brand').checked = isBrand;
+  ['name','org','role','email','phone','industry','notes','action'].forEach(k => {
+    const el = document.getElementById('f-'+k);
+    if (el) el.value = '';
+  });
+  document.getElementById('f-spots').value = '';
+  document.getElementById('contact-section').classList.toggle('visible', !isBrand);
+  populateStages(isBrand ? 'target' : 'contacted', isBrand);
+  document.getElementById('f-owner').value = 'Jonjo';
+  document.getElementById('modal').classList.add('open');
+  (document.getElementById('f-org') || document.getElementById('f-name')).focus();
+}
+
+function openEdit(id) {
+  const p = prospects.find(x => x.id===id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = p.isBrand ? 'Edit brand target' : 'Edit lead';
+  document.getElementById('del-btn').style.display = 'block';
+  document.getElementById('f-is-brand').checked = !!p.isBrand;
+  document.getElementById('f-name').value = p.name||'';
+  document.getElementById('f-org').value = p.org||'';
+  document.getElementById('f-role').value = p.role||'';
+  document.getElementById('f-email').value = p.email||'';
+  document.getElementById('f-phone').value = p.phone||'';
+  document.getElementById('f-industry').value = p.industry||'';
+  document.getElementById('f-notes').value = p.notes||'';
+  document.getElementById('f-action').value = p.action||'';
+  document.getElementById('f-spots').value = p.spots||'';
+  document.getElementById('f-owner').value = p.owner||'Jonjo';
+  document.getElementById('contact-section').classList.toggle('visible', !p.isBrand);
+  populateStages(p.stage, !!p.isBrand);
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editingId = null;
+}
+
+async function saveProspect() {
+  const isBrand = document.getElementById('f-is-brand').checked;
+  const p = {
+    isBrand,
+    org: document.getElementById('f-org').value.trim(),
+    industry: document.getElementById('f-industry').value.trim(),
+    name: isBrand ? '' : document.getElementById('f-name').value.trim(),
+    role: isBrand ? '' : document.getElementById('f-role').value.trim(),
+    email: isBrand ? '' : document.getElementById('f-email').value.trim(),
+    phone: isBrand ? '' : document.getElementById('f-phone').value.trim(),
+    stage: document.getElementById('f-stage').value,
+    owner: document.getElementById('f-owner').value,
+    spots: parseInt(document.getElementById('f-spots').value)||null,
+    notes: document.getElementById('f-notes').value.trim(),
+    action: document.getElementById('f-action').value.trim(),
+    date: new Date().toISOString().slice(0,10),
+  };
+  if (!p.org && !p.name) { document.getElementById('f-name').focus(); return; }
+  if (!isBrand && !p.name) { document.getElementById('f-name').focus(); return; }
+
+  if (editingId) {
+    const i = prospects.findIndex(x => x.id===editingId);
+    prospects[i] = { ...prospects[i], ...p };
+    if (useSupabase) await upsertSupabase(prospects[i]);
+    else saveLocal();
+  } else {
+    p.id = 'p' + Date.now();
+    prospects.push(p);
+    if (useSupabase) await upsertSupabase(p);
+    else saveLocal();
+  }
+  closeModal();
+  render();
+}
+
+async function deleteCurrent() {
+  if (!editingId || !confirm('Remove this prospect?')) return;
+  if (useSupabase) await deleteSupabase(editingId);
+  prospects = prospects.filter(x => x.id !== editingId);
+  if (!useSupabase) saveLocal();
+  closeModal();
+  render();
+}
+
+// ── EXPORT CSV ───────────────────────────────────────────────
+function exportCSV() {
+  const headers = ['Name','Organisation','Role','Email','Phone','Industry','Stage','Owner','Spots','Notes','Next Action','Date','Brand Target'];
+  const rows = prospects.map(p => [
+    p.name||'', p.org||'', p.role||'', p.email||'', p.phone||'', p.industry||'',
+    stageFor(p.stage).label, p.owner||'', p.spots||'', p.notes||'', p.action||'', p.date||'',
+    p.isBrand ? 'Yes' : 'No'
+  ].map(v => `"${String(v).replace(/"/g,'""')}"`));
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dublin2027-prospects-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+init();
+</script>
+</body>
+</html>
