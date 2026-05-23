@@ -635,21 +635,6 @@ function render() {
     }
   });
 
-  // Update sort indicators
-  ['name','stage','spots','date'].forEach(k => {
-    const el = document.getElementById('sort-'+k);
-    if (el) el.textContent = '';
-  });
-  if (activeSort === 'name-asc') document.getElementById('sort-name').textContent = ' ↑';
-  if (activeSort === 'name-desc') document.getElementById('sort-name').textContent = ' ↓';
-  if (activeSort === 'stage') document.getElementById('sort-stage').textContent = ' ↑';
-  if (activeSort === 'spots-desc') document.getElementById('sort-spots').textContent = ' ↓';
-  if (activeSort === 'date-asc') document.getElementById('sort-date').textContent = ' ↑';
-  if (activeSort === 'date-desc') document.getElementById('sort-date').textContent = ' ↓';
-
-  const tbody = document.getElementById('tbody');
-  const empty = document.getElementById('empty');
-
   // Build accordion
   const accordion = document.getElementById('accordion');
   if (!filtered.length) {
@@ -728,12 +713,12 @@ function setSort(s) { activeSort=s; render(); }
 function toggleSort(col) {
   const map = {
     name: activeSort==='name-asc' ? 'name-desc' : 'name-asc',
-    stage: 'stage',
     spots: 'spots-desc',
     date: activeSort==='date-desc' ? 'date-asc' : 'date-desc',
   };
   activeSort = map[col] || 'date-desc';
-  document.getElementById('sort-select').value = activeSort;
+  const sel = document.getElementById('sort-select');
+  if (sel) sel.value = activeSort;
   render();
 }
 
@@ -860,4 +845,4 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); 
 init();
 </script>
 </body>
-</html> 
+</html>
